@@ -321,7 +321,7 @@ class BayesianNetwork:
             evidence, evidence_card = zip(
                 *[(key, len(table_parents[key])) for key in sorted(table_parents.keys())]
             )
-            
+
         tabular_cpd = TabularCPD(
             node,
             node_card,
@@ -331,7 +331,7 @@ class BayesianNetwork:
         )
         model_copy = copy.deepcopy(self._model)
         model_copy.add_cpds(tabular_cpd)
-        model_copy.check_model()
+        #model_copy.check_model()
 
         self._model = model_copy
         return self
