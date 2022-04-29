@@ -294,10 +294,17 @@ class BayesianNetwork:
             parent_node: self.node_states[parent_node]
             for parent_node in self._structure.predecessors(node)
         }
-        table_parents = {
-            name: set(df.columns.levels[i].values)
-            for i, name in enumerate(df.columns.names)
-        }
+
+        no_parents = df.columns.names.count(None) == len(df.columns)
+
+        if no_parents:
+            table_parents = {}
+        else:
+            table_parents = {
+                name: set(df.columns.levels[i].values)
+                for i, name in enumerate(df.columns.names)
+            }
+
         if not (
             set(df.index.values) == self.node_states[node]
             and true_parents == table_parents
@@ -307,9 +314,14 @@ class BayesianNetwork:
 
         sorted_df = df.reindex(sorted(df.columns), axis=1)
         node_card = len(self.node_states[node])
-        evidence, evidence_card = zip(
-            *[(key, len(table_parents[key])) for key in sorted(table_parents.keys())]
-        )
+
+        if no_parents:
+            evidence, evidence_card = None, None
+        else:
+            evidence, evidence_card = zip(
+                *[(key, len(table_parents[key])) for key in sorted(table_parents.keys())]
+            )
+            
         tabular_cpd = TabularCPD(
             node,
             node_card,
